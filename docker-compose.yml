@@ -1,0 +1,324 @@
+﻿# =======================================================
+#   DOCKER COMPOSE EPERSGEISTS (OPTIMIZADO)
+#
+#   PERFILES DISPONIBLES:
+#      kafka    → Kafka + Zookeeper + Kafka UI (Orden: Zookeeper -> Kafka Brokers -> Kafka UI)
+#      sql      → PostgreSQL (Orden: Inicia antes que apps)
+#      nosql    → MongoDB (Orden: Inicia antes que apps)
+#      graph    → Neo4j (Orden: Inicia antes que apps)
+#      app      → Monolito epersgeistApp (Orden: Inicia después de todo lo que necesita)
+#      micro    → Microservicios (mensajería, temperatura, probabilidad) (Orden: Inicia después de todo lo que necesitan)
+#
+#   CIERRE COMPLETO (Apagado y Limpieza de Contenedores y Red):
+#    detener y eliminar todos los contenedores y la red creados en el Full Demo:
+#     docker compose --profile kafka --profile sql --profile nosql --profile graph --profile app --profile micro down -v
+#
+#   EJEMPLOS:
+#   -> Full demo (más robusto): docker compose --profile kafka --profile sql --profile nosql --profile graph --profile app --profile micro up
+#
+# =======================================================
+services:
+  # ---------------------------------------------------
+  # ZOOKEEPER
+  # ---------------------------------------------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.7.0
+    container_name: zookeeper
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_log:/var/lib/zookeeper/log
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVER_ID: 1
+    ports:
+      - "2181:2181"
+    mem_limit: 200m
+    healthcheck:
+      test: ["CMD", "sh", "-c", "echo stat | nc localhost 2181"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    profiles: ["kafka"]
+
+  # ---------------------------------------------------
+  # KAFKA BROKER 1
+  # Depende de Zookeeper HEALTHY
+  # ---------------------------------------------------
+  kafka1:
+    image: confluentinc/cp-kafka:7.7.0
+    container_name: kafka1
+    depends_on:
+      zookeeper:
+        condition: service_healthy # Esperamos a que Zookeeper esté listo
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:9092,EXTERNAL://localhost:29092
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+    mem_limit: 600m
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    profiles: ["kafka"]
+
+  # ---------------------------------------------------
+  # KAFKA BROKER 2
+  # Depende de Kafka 1 HEALTHY
+  # ---------------------------------------------------
+  kafka2:
+    image: confluentinc/cp-kafka:7.7.0
+    container_name: kafka2
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+      kafka1:
+        condition: service_healthy # Esperamos a que el Broker 1 esté listo
+    ports:
+      - "29093:29093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:29093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:9093,EXTERNAL://localhost:29093
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+    mem_limit: 600m
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9093"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    profiles: ["kafka"]
+
+  # ---------------------------------------------------
+  # KAFKA UI
+  # Depende de Kafka Brokers HEALTHY
+  # ---------------------------------------------------
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    container_name: kafka_ui
+    depends_on:
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:9092,kafka2:9093
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    mem_limit: 400m
+    profiles: ["kafka"]
+
+  # ---------------------------------------------------
+  # POSTGRES
+  # ---------------------------------------------------
+  postgres:
+    image: postgres:16.3
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: epersgeist
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      TZ: UTC
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    mem_limit: 400m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    profiles: ["sql"]
+
+  # ---------------------------------------------------
+  # NEO4J
+  # ---------------------------------------------------
+  neo4j:
+    image: neo4j:5.23.0
+    container_name: neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/rootroot
+      NEO4J_PLUGINS: '["graph-data-science"]'
+    volumes:
+      - neo4j_data:/data
+    mem_limit: 1024m
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "rootroot", "RETURN 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    profiles: ["graph"]
+
+  # ---------------------------------------------------
+  # MONGO
+  # ---------------------------------------------------
+  mongo:
+    image: mongo:8.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    mem_limit: 350m
+    healthcheck:
+      test: [ "CMD-SHELL", "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'" ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------
+  # MONOLITO EPERSGEIST
+  # ---------------------------------------------------
+  epersgeist:
+    build:
+      context: .
+      dockerfile: Dockerfile.epersgeist
+    container_name: epersgeist
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      KAFKA_BOOTSTRAP: kafka1:9092,kafka2:9093
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/epersgeist
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/epersgeist
+
+      SPRING_NEO4J_URI: bolt://neo4j:7687
+      SPRING_NEO4J_AUTHENTICATION_USERNAME: neo4j
+      SPRING_NEO4J_AUTHENTICATION_PASSWORD: rootroot
+    ports:
+      - "8080:8080"
+    mem_limit: 500m
+    profiles: ["app"]
+
+  # ---------------------------------------------------
+  # MICROSERVICIO – MENSAJERÍA
+  # ---------------------------------------------------
+  servicio_mensajeria:
+    build:
+      context: .
+      dockerfile: Dockerfile.servicio_mensajeria
+    container_name: servicio_mensajeria
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP: kafka1:9092,kafka2:9093
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/epersgeist
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/epersgeist
+
+      SPRING_NEO4J_URI: bolt://neo4j:7687
+      SPRING_NEO4J_AUTHENTICATION_USERNAME: neo4j
+      SPRING_NEO4J_AUTHENTICATION_PASSWORD: rootroot
+    ports:
+      - "8090:8080"
+    mem_limit: 300m
+    profiles: ["micro", "sm"]
+
+  # ---------------------------------------------------
+  # MICROSERVICIO – TEMPERATURA
+  # ---------------------------------------------------
+  servicio_temperatura:
+    build:
+      context: .
+      dockerfile: Dockerfile.servicio_temperatura
+    container_name: servicio_temperatura
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+          condition: service_healthy
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: temperatura-real
+      KAFKA_BOOTSTRAP: kafka1:9092,kafka2:9093
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/epersgeist
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    mem_limit: 300m
+    profiles: ["micro", "st"]
+
+  # ---------------------------------------------------
+  # MICROSERVICIO – PROBABILIDAD
+  # ---------------------------------------------------
+  servicio_probabilidad:
+    build:
+      context: .
+      dockerfile: Dockerfile.servicio_probabilidad
+    container_name: servicio_probabilidad
+    depends_on:
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP: kafka1:9092,kafka2:9093
+    mem_limit: 300m
+    profiles: ["micro", "sp"]
+
+# ---------------------------------------------------
+# VOLUMES
+# ---------------------------------------------------
+volumes:
+  postgres_data:
+  neo4j_data:
+  mongo_data:
+  zookeeper_data:
+  zookeeper_log:

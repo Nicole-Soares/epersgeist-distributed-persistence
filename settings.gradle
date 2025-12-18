@@ -1,0 +1,8 @@
+rootProject.name = 'kEPERSonajes-TP'
+
+include 'commons'
+include 'epersgeist'
+include 'servicio_mensajeria'
+include 'servicio_temperatura'
+include 'integration-tests'
+include 'servicio_probabilidad'

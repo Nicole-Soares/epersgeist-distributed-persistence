@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.1'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation project(':epersgeist')
+    testImplementation project(':servicio_mensajeria')
+    testImplementation project(':commons')
+    testImplementation project(':servicio_temperatura')
+    testImplementation project(':servicio_probabilidad')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'org.springframework.kafka:spring-kafka:3.0.17'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test:3.0.17'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testImplementation 'org.testcontainers:junit-jupiter:1.19.8'
+    testImplementation 'org.testcontainers:neo4j:1.19.8'
+    testImplementation 'org.testcontainers:postgresql:1.19.8'
+    testImplementation "org.testcontainers:testcontainers:2.0.2"
+    testImplementation "org.testcontainers:mongodb"
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+    testImplementation 'org.awaitility:awaitility:4.2.0'
+    testRuntimeOnly 'org.postgresql:postgresql'
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    jvmArgs "-Duser.timezone=America/Argentina/Buenos_Aires"
+}

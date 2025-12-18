@@ -1,0 +1,56 @@
+### -----------------------------------------
+###  GRADLE
+### -----------------------------------------
+.gradle/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# Archivos de ejecución
+*.log
+
+### -----------------------------------------
+###  JAVA / SPRING BOOT
+### -----------------------------------------
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs y reportes
+hs_err_pid*
+replay_pid*
+*.hprof
+
+sensor_inputs.json
+
+### -----------------------------------------
+###  INTELLIJ IDEA
+### -----------------------------------------
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+### -----------------------------------------
+###  OPERATING SYSTEM FILES
+### -----------------------------------------
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+### -----------------------------------------
+###  DOCKER
+### -----------------------------------------
+docker/logs/
+*.pid
+*.seed
+
+### -----------------------------------------
+###  TEST
+### -----------------------------------------
+test-output/

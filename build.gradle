@@ -1,0 +1,12 @@
+allprojects {
+    group = 'ar.edu.unq'
+    version = '1.0.0'
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+}
