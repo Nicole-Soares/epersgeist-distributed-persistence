@@ -1,31 +1,117 @@
 
-> _Otro viernes en la facu, ¿nada raro, no?_
-> _Cinco personas de informática y un ritual sin razón._
->
-> _Con sal, velas y humo nos conectamos al más allá..._
-> _y ahora las memorias del infierno nos vuelven a golpear._
 
-Lo que en principio fue un viernes más en la universisdad derivó, de alguna manera, en un pseudo-ritual en el cual los cinco integrantes conectaron momentáneamente con seres de otros mundos, algunos de aspecto etéreo, otros antropomórficos, pero con claras características ajenas a los humanos.
+# epersgeist-distributed-persistence
 
-Tras el corto estado eufórico de esa experiencia, los cinco programadores volvieron en sí, sentados en el living de la casa, atónitos ante lo visto.
+Sistema distribuido orientado a eventos con Apache Kafka y persistencia poliglota.
 
-Miradas desconcertadas volaron entre ellos durante unos minutos, pero todos comprendieron que ahora tenían una misión: representar a estos espectros en un modelo computable.
+Este proyecto modela un dominio compuesto por **espíritus, médiums y ubicaciones**,
+evolucionando progresivamente desde un enfoque monolítico hacia una arquitectura
+distribuida basada en eventos. El objetivo principal es explorar distintas estrategias
+de persistencia y comunicación entre componentes, priorizando claridad conceptual,
+diseño y desacoplamiento.
 
-<p align="center">
-  <img src="enunciado/epersgeist.png"/>
-</p>
+---
 
-## Entregas
-- [Entrega 1 - JDBC](enunciado/entrega1/entrega1.md)
-- [Entrega 2 - ORM - Hibernate](enunciado/entrega2/entrega2.md)
-- [Entrega 3 - ORM - Spring](enunciado/entrega3/entrega3.md)
-- [Entrega 4 - NoSQL - Neo4j - Spring](/enunciado/entrega4/entrega4.md)
-- [Entrega 5 - NoSQL - MongoDB - Spring](/enunciado/entrega5/entrega5.md)
+## Descripción general
 
-## Consideraciones
-- Se entregará utilizando git. El grupo deberá subir el código del TP a github, hacer un tag y notificarnos de dicho tag para que podamos corregirlo. [Acá](https://sites.google.com/site/estrategiasdepersistencia/material/entregando-con-git) tienen un breve tutorial sobre cómo hacerlo.
-- Se considerará a un TP como entregado solo cuando tenga implementada toda la funcionalidad que se pide para la entrega.
-- Se evaluará no sólo que el TP cumpla con todos los requisitos, sino la calidad del mismo (buen diseño, simplicidad, buena distribución de responsabilidades, prolijidad del código, código no repetido, formalidad en la entrega, etc)
-- También se evaluará la debida implementación de GitFlow.
-- Se espera que trabajen en el TP durante las dos primeras horas de clase todos los viernes, pero eso no resta que para llegar a cumplir con los tiempos de entrega tengan que trabajar en casa. ¡Planeen conforme a ello! Un TP no entregado a tiempo es un TP reentregado. **Sólo cuentan con 3 reentregas durante la cursada.**
-- Si algo no les funciona o algo no entienden, ¡avisen antes! En el día de la entrega o el anterior ya es demasiado tarde.
+Epersgeist es un sistema que representa entidades del mundo espiritual y sus interacciones,
+permitiendo modelar comportamientos complejos a través de distintos mecanismos de
+persistencia y mensajería.
+
+A lo largo de su evolución, el proyecto incorpora múltiples tecnologías de bases de datos
+y finalmente adopta una arquitectura **event-driven**, donde distintos servicios se
+comunican de manera asincrónica utilizando **Apache Kafka**.
+
+---
+
+## Arquitectura
+
+En su etapa final, el sistema se organiza como un **sistema distribuido simple**, compuesto
+por múltiples servicios que se ejecutan de forma independiente y se comunican exclusivamente
+mediante eventos.
+
+Los servicios no se invocan entre sí de manera directa ni comparten código, lo que reduce
+el acoplamiento y permite una evolución más flexible del sistema.
+
+### Servicios
+
+- **Epersgeist (core)**  
+  Servicio principal del dominio. Modela espíritus, médiums y ubicaciones, y actúa como
+  orquestador del comportamiento central del sistema.
+
+- **Servicio de mensajería**  
+  Encargado de la emisión y consumo de eventos relacionados con la comunicación entre
+  entidades del dominio.
+
+- **Servicio de temperatura**  
+  Publica y procesa eventos asociados a cambios de temperatura en ubicaciones.
+
+- **Servicio de probabilidad**  
+  Consume eventos del sistema y realiza cálculos probabilísticos derivados de los mismos.
+
+### Comunicación
+
+- Comunicación asincrónica mediante **Apache Kafka**
+- Interacción basada en eventos
+
+---
+
+## Persistencia
+
+El proyecto utiliza un enfoque de **persistencia poliglota**, seleccionando distintas
+tecnologías según la naturaleza de los datos:
+
+- **PostgreSQL**: dominio principal
+- **MongoDB**: coordenadas
+- **Neo4j**: relaciones entre ubicaciones
+
+---
+
+## Tecnologías utilizadas
+
+- Java
+- Spring Boot
+- Apache Kafka
+- PostgreSQL
+- MongoDB
+- Neo4j
+- Docker
+- Docker Compose
+
+---
+
+## Ejecución del proyecto
+
+### Prerrequisitos
+
+- Docker
+- Docker Compose
+
+No es necesario instalar Java, Maven, Kafka ni bases de datos de forma local.
+Todo el entorno se ejecuta mediante contenedores.
+
+---
+
+### Perfiles disponibles
+
+El proyecto utiliza **Docker Compose profiles** para permitir distintos escenarios
+de ejecución:
+
+- `kafka` → Kafka, Zookeeper y Kafka UI
+- `sql` → PostgreSQL
+- `nosql` → MongoDB
+- `graph` → Neo4j
+- `app` → Servicio principal Epersgeist (monolito del dominio)
+- `micro` → Microservicios (mensajería, temperatura y probabilidad)
+
+---
+
+### Ejecución completa (recomendada)
+
+Para levantar todo el sistema (bases de datos, Kafka, servicio principal y microservicios):
+
+```bash
+docker compose --profile kafka --profile sql --profile nosql --profile graph --profile app --profile micro up
+
+
+
