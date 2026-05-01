@@ -6,6 +6,13 @@
 !gradle/wrapper/gradle-wrapper.jar
 !gradle/wrapper/gradle-wrapper.properties
 
+# Secretos y Config Local
+application.properties
+application-*.properties
+!application-dev.properties  # (Opcional: permitir solo el de desarrollo)
+application.yml
+*.properties.local
+
 # Archivos de ejecución
 *.log
 
