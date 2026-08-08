@@ -58,3 +58,5 @@ public abstract class EspirituSQL{
         this.ubicacion = ubicacion;
         this.hostilidad = hostilidad;
     }
+
+}

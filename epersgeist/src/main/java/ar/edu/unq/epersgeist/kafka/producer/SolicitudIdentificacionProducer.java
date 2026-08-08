@@ -32,8 +32,7 @@ public class SolicitudIdentificacionProducer {
                 espiritu.getId(),
                 espiritu.getNombre(),
                 espiritu.getClass().getSimpleName(),
-                espiritu.getHostilidadNormalizada(),
-                0
+                espiritu.getHostilidadNormalizada()
         );
 
         SolicitudIdentificacionDTO solicitud = new SolicitudIdentificacionDTO(

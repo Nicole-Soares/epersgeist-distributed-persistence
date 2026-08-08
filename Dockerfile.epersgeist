@@ -1,7 +1,14 @@
-FROM gradle:8.7-jdk21 AS builder
+FROM eclipse-temurin:21-jdk AS builder
+
 WORKDIR /app
+
+# Copiar todo el proyecto (incluye gradle/wrapper/gradle-wrapper.jar ahora en el repo)
 COPY . .
-RUN gradle :epersgeist:bootJar --stacktrace --no-daemon
+
+# Convertir CRLF → LF (el gradlew viene de Windows) y dar permisos de ejecución
+RUN sed -i 's/\r//' gradlew && chmod +x gradlew
+
+RUN ./gradlew :epersgeist:bootJar --no-daemon -x test
 
 FROM eclipse-temurin:21-jdk
 WORKDIR /app

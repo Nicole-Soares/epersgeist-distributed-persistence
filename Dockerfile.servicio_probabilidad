@@ -1,10 +1,12 @@
-FROM gradle:8.7-jdk21 AS builder
+FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN gradle :servicio_probabilidad:bootJar --stacktrace --no-daemon
+RUN sed -i 's/\r//' gradlew && chmod +x gradlew
+
+RUN ./gradlew :servicio_probabilidad:bootJar --no-daemon -x test
 
 FROM eclipse-temurin:21-jdk-alpine
 

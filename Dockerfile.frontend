@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────
+# Stage 1: Build React + Vite app
+# ─────────────────────────────────────────────
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copiar solo manifiestos primero para aprovechar cache de Docker
+COPY frontend/package*.json ./
+RUN npm install
+
+# Copiar el resto del código fuente
+COPY frontend/ .
+
+# Las URLs del backend se resuelven en el navegador del cliente,
+# por lo que apuntan a localhost (el usuario accede desde su máquina).
+# Si quisieras cambiarlas, editá el .env antes de buildear.
+ARG VITE_EPERSGEIST_API_URL=http://localhost:8080
+ARG VITE_MENSAJERIA_API_URL=http://localhost:8090
+ENV VITE_EPERSGEIST_API_URL=$VITE_EPERSGEIST_API_URL
+ENV VITE_MENSAJERIA_API_URL=$VITE_MENSAJERIA_API_URL
+
+RUN npm run build
+
+# ─────────────────────────────────────────────
+# Stage 2: Serve with Nginx
+# ─────────────────────────────────────────────
+FROM nginx:1.27-alpine
+
+# Configuración personalizada para React Router (SPA)
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copiar el build de Vite al directorio público de nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]

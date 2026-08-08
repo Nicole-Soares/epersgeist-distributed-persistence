@@ -155,9 +155,9 @@ public class MediumServiceImpl implements MediumService {
     public Espiritu invocar(Long mediumId, Long espirituId) {
         Espiritu espiritu = espirituRepository.findById(espirituId);
         Medium medium = mediumRepository.findById(mediumId);
-        this.validarCercaniaEspiritu(medium, espiritu);
         medium.invocarA(espiritu);
         mediumRepository.save(medium);
+        espirituRepository.save(espiritu);
         return espiritu;
     }
 

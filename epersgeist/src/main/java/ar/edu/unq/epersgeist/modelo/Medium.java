@@ -191,6 +191,9 @@ public class Medium implements Serializable, EntidadCoordenadaInfo {
     }
 
     public void moverA(Ubicacion ubicacionDestino, Double latitud, Double longitud) {
+        if (this.ubicacion != null && ubicacionDestino != null && this.ubicacion.getId().equals(ubicacionDestino.getId())) {
+            throw new UbicacionLejanaException("El médium ya se encuentra en la ubicación de destino.");
+        }
         this.validarQuePuedaLlegarALaUbicacionDesdeLaUbicacionActual(ubicacionDestino);
         this.validarDistanciaARecorrerMenorA30(latitud, longitud);
         int costo = this.ubicacion.costoHacia(ubicacionDestino);
@@ -202,7 +205,8 @@ public class Medium implements Serializable, EntidadCoordenadaInfo {
     }
 
     private void validarDistanciaARecorrerMenorA30(Double latitud, Double longitud) {
-        Coordenadas coordenadasDestino = new Coordenadas(latitud, longitud);
+        if (this.getCoordenadas() == null) return;
+        Coordenadas coordenadasDestino = new Coordenadas(longitud, latitud);
         double distancia = this.getCoordenadas().calcularDistanciaA(coordenadasDestino);
 
         if (distancia > 30) {

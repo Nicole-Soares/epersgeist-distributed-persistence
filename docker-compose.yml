@@ -1,4 +1,4 @@
-﻿# =======================================================
+# =======================================================
 #   DOCKER COMPOSE EPERSGEISTS (OPTIMIZADO)
 #
 #   PERFILES DISPONIBLES:
@@ -8,13 +8,15 @@
 #      graph    → Neo4j (Orden: Inicia antes que apps)
 #      app      → Monolito epersgeistApp (Orden: Inicia después de todo lo que necesita)
 #      micro    → Microservicios (mensajería, temperatura, probabilidad) (Orden: Inicia después de todo lo que necesitan)
+#      front    → Frontend React (Nginx en puerto 3000)
 #
 #   CIERRE COMPLETO (Apagado y Limpieza de Contenedores y Red):
 #    detener y eliminar todos los contenedores y la red creados en el Full Demo:
-#     docker compose --profile kafka --profile sql --profile nosql --profile graph --profile app --profile micro down -v
+#     docker compose --profile kafka --profile sql --profile nosql --profile graph --profile app --profile micro --profile front down -v
 #
 #   EJEMPLOS:
-#   -> Full demo (más robusto): docker compose --profile kafka --profile sql --profile nosql --profile graph --profile app --profile micro up
+#   -> Full demo (más robusto): docker compose --profile kafka --profile sql --profile nosql --profile graph --profile app --profile micro --profile front up
+#   -> Solo frontend (asume backend ya corriendo): docker compose --profile front up
 #
 # =======================================================
 services:
@@ -167,15 +169,19 @@ services:
     environment:
       NEO4J_AUTH: neo4j/rootroot
       NEO4J_PLUGINS: '["graph-data-science"]'
+      # Límites explícitos de memoria para que no supere el mem_limit del contenedor
+      NEO4J_server_memory_heap_initial__size: 256m
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 256m
     volumes:
       - neo4j_data:/data
-    mem_limit: 1024m
+    mem_limit: 1200m
     healthcheck:
       test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "rootroot", "RETURN 1"]
       interval: 20s
       timeout: 10s
       retries: 10
-      start_period: 40s
+      start_period: 60s
     profiles: ["graph"]
 
   # ---------------------------------------------------
@@ -313,6 +319,22 @@ services:
       KAFKA_BOOTSTRAP: kafka1:9092,kafka2:9093
     mem_limit: 300m
     profiles: ["micro", "sp"]
+
+  # ---------------------------------------------------
+  # FRONTEND – React + Vite servido con Nginx
+  # Puerto: 3000 → http://localhost:3000
+  # Nota: Las URLs del backend (8080 y 8090) resuelven
+  # desde el navegador del cliente, no desde el contenedor.
+  # ---------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: epersgeist_frontend
+    ports:
+      - "3000:3000"
+    mem_limit: 50m
+    profiles: ["front"]
 
 # ---------------------------------------------------
 # VOLUMES
