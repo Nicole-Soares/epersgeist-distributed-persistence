@@ -77,6 +77,7 @@ public class EspirituServiceImpl implements EspirituService {
         Espiritu espiritu = this.espirituRepository.findById(espirituId);
         Medium medium = this.mediumRepository.findById(mediumId);
         medium.conectarseAEspiritu(espiritu);
+        this.espirituRepository.save(espiritu);
         return this.mediumRepository.save(medium);
     }
 

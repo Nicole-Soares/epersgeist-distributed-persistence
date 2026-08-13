@@ -69,6 +69,7 @@ public class Medium implements Serializable, EntidadCoordenadaInfo {
 
     public void descansar(){
         this.recuperarMana(this.cantManaARecuperar());
+        this.cordura = CORDURA_MAXIMA;
         if (noTieneEspiritus()) {
             this.recuperarConexionDeLosEspiritus();
         }
@@ -194,9 +195,13 @@ public class Medium implements Serializable, EntidadCoordenadaInfo {
         if (this.ubicacion != null && ubicacionDestino != null && this.ubicacion.getId().equals(ubicacionDestino.getId())) {
             throw new UbicacionLejanaException("El médium ya se encuentra en la ubicación de destino.");
         }
-        this.validarQuePuedaLlegarALaUbicacionDesdeLaUbicacionActual(ubicacionDestino);
-        this.validarDistanciaARecorrerMenorA30(latitud, longitud);
-        int costo = this.ubicacion.costoHacia(ubicacionDestino);
+        // Se comenta la restricción de conexión previa entre ubicaciones a pedido del usuario:
+        // this.validarQuePuedaLlegarALaUbicacionDesdeLaUbicacionActual(ubicacionDestino);
+        // Se comenta la restricción de 30 km a pedido del usuario:
+        // this.validarDistanciaARecorrerMenorA30(latitud, longitud);
+        int costo = (this.ubicacion != null && this.ubicacion.getConexiones() != null && this.ubicacion.getConexiones().containsKey(ubicacionDestino.getId()))
+                ? this.ubicacion.costoHacia(ubicacionDestino)
+                : 10;
         // Actualizo ubicación y coordenadas
         this.ubicacion = ubicacionDestino;
         this.coordenadas = new Coordenadas(longitud, latitud);
@@ -205,20 +210,23 @@ public class Medium implements Serializable, EntidadCoordenadaInfo {
     }
 
     private void validarDistanciaARecorrerMenorA30(Double latitud, Double longitud) {
-        if (this.getCoordenadas() == null) return;
-        Coordenadas coordenadasDestino = new Coordenadas(longitud, latitud);
-        double distancia = this.getCoordenadas().calcularDistanciaA(coordenadasDestino);
-
-        if (distancia > 30) {
-            throw new UbicacionLejanaException("La ubicación destino está a más de 30 km de la actual.");
-        }
+        // Se comenta la validación de 30km a pedido del usuario:
+        // if (this.getCoordenadas() == null) return;
+        // Coordenadas coordenadasDestino = new Coordenadas(longitud, latitud);
+        // double distancia = this.getCoordenadas().calcularDistanciaA(coordenadasDestino);
+        // if (distancia > 30) {
+        //     throw new UbicacionLejanaException("La ubicación destino está a más de 30 km de la actual.");
+        // }
     }
+
 
     private void validarQuePuedaLlegarALaUbicacionDesdeLaUbicacionActual(Ubicacion ubicacionDestino) {
-        if(!(this.ubicacion.estaConectadaCon(ubicacionDestino))){
-            throw new UbicacionLejanaException();
-        }
+        // Se comenta la restricción de grafo a pedido del usuario:
+        // if(!(this.ubicacion.estaConectadaCon(ubicacionDestino))){
+        //     throw new UbicacionLejanaException();
+        // }
     }
+
 
     private void moverEspiritus(Ubicacion ubicacion, Double latitud, Double longitud) {
         for(Espiritu espiritu : List.copyOf(this.espiritus)){

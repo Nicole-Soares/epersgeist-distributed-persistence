@@ -23,7 +23,7 @@ export function CreateEntityModal({ onClose, locations, onRefresh }) {
       const lat = Number(locForm.latitud);
       const lon = Number(locForm.longitud);
       const d = 0.001;
-      await locationService.crearUbicacion({
+      const newLoc = await locationService.crearUbicacion({
         nombre: locForm.nombre,
         tipo: locForm.tipo,
         energia: Number(locForm.energia),
@@ -33,11 +33,25 @@ export function CreateEntityModal({ onClose, locations, onRefresh }) {
           { latitud: lat - d, longitud: lon - d }
         ]
       });
+
+      // Auto-conectar bidireccionalmente con todas las ubicaciones existentes
+      if (newLoc?.id && locations && locations.length > 0) {
+        for (const loc of locations) {
+          try {
+            await locationService.conectarUbicaciones(newLoc.id, loc.id, 10);
+            await locationService.conectarUbicaciones(loc.id, newLoc.id, 10);
+          } catch (e) {
+            // Ignorar silenciando advertencias secundarias
+          }
+        }
+      }
+
       showAlert('¡Ubicación creada con éxito!', 'CREACIÓN EXITOSA', 'success');
       onRefresh();
       onClose();
     } catch (err) {
       showAlert(formatErrorMessage(err), 'ERROR DE CREACIÓN', 'error');
+
     } finally {
       setLoading(false);
     }

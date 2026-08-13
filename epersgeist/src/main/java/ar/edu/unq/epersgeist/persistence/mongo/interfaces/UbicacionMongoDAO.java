@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.List;
+
 public interface UbicacionMongoDAO extends MongoRepository<UbicacionMongo, String>, UbicacionMongoRepositoryCustom {
 
     /**
@@ -17,10 +19,10 @@ public interface UbicacionMongoDAO extends MongoRepository<UbicacionMongo, Strin
     boolean existsByAreaIntersecting(GeoJsonPolygon poligono);
 
     /**
-     * Devuelve la UbicacionMongo cuya area contenga ese punto dado.
+     * Devuelve las UbicacionMongo cuya area contenga ese punto dado.
      * @param punto El punto el cual ser quiere saber a que ubicacion pertenece.
-     * @return La UbicacionMongo que contenga ese punto, si no hay ninguna devuelve null
+     * @return La lista de UbicacionMongo que contenga ese punto
      */
     @Query("{ 'area': { $geoIntersects: { $geometry: ?0 } } }")
-    UbicacionMongo findByPuntoDentroDelArea(GeoJsonPoint punto);
+    List<UbicacionMongo> findByPuntoDentroDelArea(GeoJsonPoint punto);
 }

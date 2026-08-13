@@ -173,52 +173,6 @@ export function SpiritRoster({ spirits, mediums, locations = [], onRefresh }) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div className="hud-panel" style={{ padding: '20px' }}>
-          <h3 className="font-orbitron" style={{ color: 'var(--amber-gold)', fontSize: '1rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Crown size={18} /> Dominación Espiritual
-          </h3>
-
-          <div style={{ display: 'grid', gap: '10px', fontSize: '0.85rem' }}>
-            <div>
-              <label style={{ color: 'var(--text-muted)' }}>Espíritu Dominante:</label>
-              <select
-                value={dominantSpiritId}
-                onChange={(e) => setDominantSpiritId(e.target.value)}
-                style={{ width: '100%', background: '#0a0e17', border: '1px solid var(--bg-card-border)', color: '#fff', padding: '6px', borderRadius: '4px' }}
-              >
-                <option value="">-- Seleccionar --</option>
-                {spirits.map(s => (
-                  <option key={s.id} value={s.id}>{s.nombre}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{ color: 'var(--text-muted)' }}>Espíritu a Dominar:</label>
-              <select
-                value={targetDominatedId}
-                onChange={(e) => setTargetDominatedId(e.target.value)}
-                style={{ width: '100%', background: '#0a0e17', border: '1px solid var(--bg-card-border)', color: '#fff', padding: '6px', borderRadius: '4px' }}
-              >
-                <option value="">-- Seleccionar --</option>
-                {spirits.filter(s => s.id !== Number(dominantSpiritId)).map(s => (
-                  <option key={s.id} value={s.id}>{s.nombre}</option>
-                ))}
-              </select>
-            </div>
-
-
-            <button
-              className="btn-hud"
-              onClick={handleDominar}
-              disabled={loading || !dominantSpiritId || !targetDominatedId}
-              style={{ marginTop: '8px', justifyContent: 'center' }}
-            >
-              Ejecutar Dominación
-            </button>
-          </div>
-        </div>
-
-        <div className="hud-panel" style={{ padding: '20px' }}>
           <h3 className="font-orbitron" style={{ color: 'var(--demonic-red)', fontSize: '1rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <ShieldAlert size={18} /> Ranking de Demonios
           </h3>

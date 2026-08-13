@@ -221,13 +221,14 @@ public class UbicacionRepositoryImpl implements UbicacionRepository {
         GeoJsonPoint punto = new GeoJsonPoint(longitud, latitud);
 
         // Buscar la ubicación Mongo cuyo área contenga ese punto
-        UbicacionMongo ubicacionMongo = ubicacionMongoDAO.findByPuntoDentroDelArea(punto);
+        List<UbicacionMongo> ubicacionesMongo = ubicacionMongoDAO.findByPuntoDentroDelArea(punto);
 
-        if (ubicacionMongo == null) {
+        if (ubicacionesMongo == null || ubicacionesMongo.isEmpty()) {
             throw new EntityNotFoundException(
                     "No se encontró la ubicación que contenga las coordenadas (" + latitud + ", " + longitud + ")"
             );
         }
+        UbicacionMongo ubicacionMongo = ubicacionesMongo.getFirst();
             // pasamos a long para buscar por id la ubicación SQL y Neo4j
         Long ubicacionId = Long.parseLong(ubicacionMongo.getId());
 

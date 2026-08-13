@@ -6,9 +6,20 @@ import jakarta.validation.constraints.NotBlank;
 
 @JsonIgnoreProperties(ignoreUnknown = false)
 public record ActualizarEspirituDTO(
-        @NotBlank String nombre
+        @NotBlank String nombre,
+        Integer nivelDeConexion
 ) {
     public void sobrescribir(Espiritu espiritu) {
-        espiritu.setNombre(nombre);
+        if (nombre != null && !nombre.isBlank()) {
+            espiritu.setNombre(nombre);
+        }
+        if (nivelDeConexion != null) {
+            int nuevoNivel = Math.max(0, Math.min(100, nivelDeConexion));
+            espiritu.setNivelDeConexion(nuevoNivel);
+            if (nuevoNivel <= 0) {
+                espiritu.desconectarDelMediumActual();
+            }
+        }
     }
 }
+

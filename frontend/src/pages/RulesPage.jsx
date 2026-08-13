@@ -31,10 +31,9 @@ const TAG = ({ children, color }) => (
 );
 
 export function RulesPage() {
-  const [activeSection, setActiveSection] = useState('network');
+  const [activeSection, setActiveSection] = useState('locations');
 
   const sections = [
-    { id: 'network', label: 'Mapa de Recorrido (Subte)', icon: Navigation },
     { id: 'locations', label: 'Ubicaciones', icon: MapPin },
     { id: 'spirits', label: 'Espíritus', icon: Ghost },
     { id: 'mediums', label: 'Mediums', icon: User },
@@ -84,123 +83,8 @@ export function RulesPage() {
       {/* CONTENT */}
       <div>
 
-        {/* RECORRIDO DE UBICACIONES / MAPA DE SUBTE PSIQUICO */}
-        {activeSection === 'network' && (
-          <div>
-            <h2 className="font-orbitron glow-text-green" style={{ color: 'var(--primary-green)', fontSize: '1.3rem', marginBottom: '8px' }}>
-              🚇 RED DE RECORRIDO Y CONEXIONES PSIÓNICAS
-            </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
-              Imaginá las ubicaciones como un <strong>mapa de líneas de subte</strong>. Un médium sólo puede viajar entre estaciones (ubicaciones) que están conectadas directamente por una línea de conexión.
-            </p>
-
-            {/* DIAGRAMA ESTILO SUBTE */}
-            <div className="hud-panel" style={{ padding: '24px', marginBottom: '24px', background: 'linear-gradient(135deg, #070b12 0%, #0d1524 100%)', borderColor: 'var(--ice-blue)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(0,229,255,0.2)', paddingBottom: '10px' }}>
-                <span className="font-orbitron" style={{ color: 'var(--ice-blue)', fontSize: '0.9rem', letterSpacing: '1px' }}>
-                  🗺️ ESQUEMA DE LÍNEAS DE TRÁNSITO PARANORMAL
-                </span>
-                <span style={{ fontSize: '0.75rem', background: 'rgba(0,229,255,0.1)', color: 'var(--ice-blue)', border: '1px solid var(--ice-blue)', padding: '2px 8px', borderRadius: '4px' }}>
-                  RED CONECTADA DIRECTA
-                </span>
-              </div>
-
-              {/* VISUAL METRO LINE */}
-              <div style={{ position: 'relative', padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '30px' }}>
-                
-                {/* LINEA ASTRALIAS */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                  <span className="font-orbitron" style={{ background: '#00ff9d', color: '#000', padding: '4px 10px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.8rem' }}>
-                    LÍNEA A (SANTUARIOS)
-                  </span>
-
-                  <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1, gap: '0px' }}>
-                    
-                    {/* Estacion 1 */}
-                    <div style={{ textAlign: 'center', minWidth: '130px' }}>
-                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--primary-green)', border: '4px solid #000', margin: '0 auto 6px', boxShadow: '0 0 10px var(--primary-green)' }} />
-                      <div style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#fff' }}>Tanglewood</div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--primary-green)' }}>✨ Santuario</div>
-                    </div>
-
-                    {/* Tramo 1 */}
-                    <div style={{ flexGrow: 1, height: '6px', background: 'linear-gradient(90deg, #00ff9d, #ff2a5f)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: '0.7rem', background: '#070b12', color: 'var(--amber-gold)', border: '1px solid var(--amber-gold)', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold' }}>
-                        -10 Maná
-                      </span>
-                    </div>
-
-                    {/* Estacion 2 */}
-                    <div style={{ textAlign: 'center', minWidth: '140px' }}>
-                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--demonic-red)', border: '4px solid #000', margin: '0 auto 6px', boxShadow: '0 0 10px var(--demonic-red)' }} />
-                      <div style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#fff' }}>Graveyard Souls</div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--demonic-red)' }}>💀 Cementerio</div>
-                    </div>
-
-                    {/* Tramo 2 */}
-                    <div style={{ flexGrow: 1, height: '6px', background: 'linear-gradient(90deg, #ff2a5f, #00ff9d)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: '0.7rem', background: '#070b12', color: 'var(--amber-gold)', border: '1px solid var(--amber-gold)', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold' }}>
-                        -15 Maná
-                      </span>
-                    </div>
-
-                    {/* Estacion 3 */}
-                    <div style={{ textAlign: 'center', minWidth: '130px' }}>
-                      <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--primary-green)', border: '4px solid #000', margin: '0 auto 6px', boxShadow: '0 0 10px var(--primary-green)' }} />
-                      <div style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#fff' }}>Asylum</div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--primary-green)' }}>✨ Santuario</div>
-                    </div>
-
-                  </div>
-                </div>
-
-              </div>
-
-              {/* EXPLICACION CLARA */}
-              <div style={{ marginTop: '20px', background: 'rgba(0, 229, 255, 0.05)', border: '1px solid rgba(0, 229, 255, 0.2)', borderRadius: '8px', padding: '16px', fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
-                <h4 style={{ color: 'var(--ice-blue)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Compass size={16} /> ¿Cómo funciona la movilidad?
-                </h4>
-                <ul style={{ paddingLeft: '20px', display: 'grid', gap: '6px', color: 'var(--text-muted)' }}>
-                  <li><strong>Viaje directo:</strong> Solo podés mover un médium entre ubicaciones adyacentes (que tienen un tramo de conexión directo).</li>
-                  <li><strong>Costo de Maná:</strong> Cada tramo consume maná del médium. Si el médium no tiene maná suficiente o se queda en 0, es <strong>eliminado</strong> del mundo terrenal.</li>
-                  <li><strong>Viaje en Convoy:</strong> Al mover al médium, <strong>TODOS sus espíritus conectados se desplazan junto a él automáticamente</strong> a la nueva ubicación.</li>
-                </ul>
-              </div>
-            </div>
-
-            {/* CONSECUENCIAS DEL MOVIMIENTO DE ESPIRITUS */}
-            <div className="hud-panel" style={{ padding: '20px' }}>
-              <h3 style={{ color: 'var(--amber-gold)', fontSize: '1rem', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Ghost size={18} /> Efecto del Viaje sobre los Espíritus Acompañantes
-              </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                
-                <div style={{ background: 'rgba(255,50,80,0.08)', border: '1px solid var(--demonic-red)', borderRadius: '8px', padding: '14px' }}>
-                  <h4 style={{ color: 'var(--demonic-red)', marginBottom: '8px' }}>💀 Si el destino es un SANTUARIO:</h4>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-                    Los <strong>Demonios</strong> que viajan con el médium sufren rechazo sagrado y pierden <strong>10 puntos de conexión</strong>.
-                    <br />
-                    <em style={{ color: '#fff', display: 'block', marginTop: '6px' }}>⚠ Si la conexión de un demonio cae a 0, se desvincula automáticamente y queda libre en el Santuario.</em>
-                  </p>
-                </div>
-
-                <div style={{ background: 'rgba(0,255,128,0.08)', border: '1px solid var(--primary-green)', borderRadius: '8px', padding: '14px' }}>
-                  <h4 style={{ color: 'var(--primary-green)', marginBottom: '8px' }}>✨ Si el destino es un CEMENTERIO:</h4>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-                    Los <strong>Ángeles</strong> que viajan con el médium sufren la marea profana y pierden <strong>5 puntos de conexión</strong>.
-                    <br />
-                    <em style={{ color: '#fff', display: 'block', marginTop: '6px' }}>⚠ Si la conexión de un ángel cae a 0, se desvincula automáticamente y queda libre en el Cementerio.</em>
-                  </p>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-        )}
-
         {/* LOCATIONS */}
+
         {activeSection === 'locations' && (
           <div>
             <h2 className="font-orbitron" style={{ color: 'var(--ice-blue)', fontSize: '1.3rem', marginBottom: '20px' }}>
@@ -370,11 +254,12 @@ export function RulesPage() {
                   step: '2', title: 'Seleccionar y Mover un Médium', color: 'var(--ice-blue)',
                   items: [
                     'Seleccioná un investigador de la lista desplegable superior.',
-                    'Hacé click en "→ Mover Medium Aquí" en una ubicación a la cual se pueda llegar directamente desde su ubicación actual.',
+                    'Hacé click en "→ Mover Medium Aquí" en cualquier ubicación a la cual desees desplazarlo.',
                     '¡IMPORTANTE! Al mover al médium, todos sus espíritus conectados viajan automáticamente junto a él a la nueva ubicación.',
                     'Tené en cuenta que los demonios pierden 10 de conexión en Santuarios y los ángeles pierden 5 en Cementerios.'
                   ]
                 },
+
                 {
                   step: '3', title: 'Invocar vs. Conectar un Espíritu', color: 'var(--amber-gold)',
                   items: [

@@ -73,10 +73,15 @@ public class DataInitializer {
                     )
             ));
 
-            // Conectar en grafo Neo4j
+            // Conectar en grafo Neo4j bidireccionalmente para acceso libre entre todas las zonas
             ubicacionService.conectar(sanctuaryHouse.getId(), graveyard.getId(), 10L);
+            ubicacionService.conectar(graveyard.getId(), sanctuaryHouse.getId(), 10L);
+
             ubicacionService.conectar(graveyard.getId(), asylum.getId(), 15L);
+            ubicacionService.conectar(asylum.getId(), graveyard.getId(), 15L);
+
             ubicacionService.conectar(sanctuaryHouse.getId(), asylum.getId(), 25L);
+            ubicacionService.conectar(asylum.getId(), sanctuaryHouse.getId(), 25L);
 
             // --- Mediums ---
             var m1 = mediumService.create(new CrearMediumDTO(

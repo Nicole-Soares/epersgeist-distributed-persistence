@@ -5,17 +5,22 @@ const MENSAJERIA_URL = import.meta.env.VITE_MENSAJERIA_API_URL || 'http://localh
 export const spiritBoxService = {
   getComunicacionActiva: async (mediumId, ubicacionId) => {
     try {
-      return await apiFetch(`${MENSAJERIA_URL}/comunicacion-activa?mediumId=${mediumId}&ubicacionId=${ubicacionId}`, {}, "Error al verificar comunicación activa");
+      const res = await fetch(`${MENSAJERIA_URL}/comunicacion-activa?mediumId=${mediumId}&ubicacionId=${ubicacionId}`);
+      if (res.status === 404) return null;
+      if (!res.ok) return null;
+      return await res.json();
     } catch (e) {
-      if (e.status === 404) return null;
-      console.warn("Servicio de mensajería no disponible o error 404:", e.message);
+      console.warn("Sin comunicación activa o servicio offline:", e);
       return null;
     }
   },
 
   getHistorialChat: async (mediumId) => {
     try {
-      return await apiFetch(`${MENSAJERIA_URL}/historial/${mediumId}`, {}, "Error al consultar historial de chat en MongoDB");
+      const res = await fetch(`${MENSAJERIA_URL}/historial/${mediumId}`);
+      if (res.status === 404) return [];
+      if (!res.ok) return [];
+      return await res.json();
     } catch (e) {
       console.warn("Error leyendo historial de MongoDB:", e.message);
       return [];
@@ -29,3 +34,4 @@ export const spiritBoxService = {
     }, "Error al guardar la plantilla de respuesta");
   }
 };
+

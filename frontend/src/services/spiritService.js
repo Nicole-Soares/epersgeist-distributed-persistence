@@ -29,6 +29,13 @@ export const spiritService = {
     }, "Error al conectar espíritu con el medium");
   },
 
+  actualizarEspiritu: async (id, data) => {
+    return apiFetch(`${BASE_URL}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    }, "Error al actualizar el espíritu");
+  },
+
   dominarEspiritu: async (espirituADominarId, espirituDominanteId) => {
     return apiFetch(`${BASE_URL}/${espirituADominarId}/dominar/${espirituDominanteId}`, {
       method: 'PATCH'

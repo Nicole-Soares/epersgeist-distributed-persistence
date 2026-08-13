@@ -255,69 +255,9 @@ export function MapPage({ locations, mediums, onRefresh, selectedLocation, setSe
       </div>
 
       {/* SIDEBAR */}
-      {/*PARTICIÓN CACULADORA DE RUTAS*/}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div className="hud-panel" style={{ padding: '20px' }}>
-          <h3 className="font-orbitron" style={{ color: 'var(--ice-blue)', fontSize: '1rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Route size={18} /> Calculador de Rutas
-          </h3>
-
-          <div style={{ display: 'grid', gap: '10px', fontSize: '0.85rem' }}>
-            <div>
-              <label style={{ color: 'var(--text-muted)' }}>Origen:</label>
-              <div style={{ fontWeight: 'bold', color: selectedLocation ? 'var(--primary-green)' : 'var(--demonic-red)' }}>
-                {selectedLocation ? selectedLocation.nombre : 'Ninguna seleccionada'}
-              </div>
-            </div>
-
-            <div>
-              <label style={{ color: 'var(--text-muted)' }}>Destino:</label>
-              <select
-                value={targetLocId}
-                onChange={(e) => setTargetLocId(e.target.value)}
-                style={{
-                  width: '100%',
-                  background: '#0a0e17',
-                  border: '1px solid var(--bg-card-border)',
-                  color: 'var(--text-main)',
-                  padding: '6px',
-                  borderRadius: '4px',
-                  marginTop: '4px'
-                }}
-              >
-                <option value="">-- Seleccionar Destino --</option>
-                {locations.filter(l => l.id !== selectedLocation?.id).map(l => (
-                  <option key={l.id} value={l.id}>{l.nombre}</option>
-                ))}
-              </select>
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-              <button className="btn-hud" onClick={calculateShortestPath} disabled={loadingAction || !selectedLocation || !targetLocId} style={{ flex: 1, fontSize: '0.75rem', padding: '6px 8px' }}>
-                Más Corto
-              </button>
-              <button className="btn-hud btn-hud-purple" onClick={calculateProfitablePath} disabled={loadingAction || !selectedLocation || !targetLocId} style={{ flex: 1, fontSize: '0.75rem', padding: '6px 8px' }}>
-                Más Rentable
-              </button>
-            </div>
-          </div>
-
-          {pathResult && (
-            <div style={{ marginTop: '16px', background: 'rgba(0,0,0,0.4)', padding: '12px', borderRadius: '8px', border: '1px solid var(--bg-card-border)' }}>
-              <div style={{ fontSize: '0.8rem', color: 'var(--ice-blue)', fontWeight: 'bold', marginBottom: '6px' }}>{pathType}</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', fontSize: '0.85rem' }}>
-                {pathResult.map((loc, idx) => (
-                  <React.Fragment key={loc.id || idx}>
-                    <span className="badge-hud badge-green">{loc.nombre}</span>
-                    {idx < pathResult.length - 1 && <ArrowRight size={12} color="var(--text-muted)" />}
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* PARTICIÓN DE ZONAS SOBRECARGADAS */}
+
         <div className="hud-panel" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <h3 className="font-orbitron" style={{ color: 'var(--demonic-red)', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>

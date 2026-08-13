@@ -11,7 +11,7 @@ export function MediumCard({ medium, locations, freeSpirits, onRefresh }) {
   const [selectedSpiritId, setSelectedSpiritId] = useState('');
 
   const locName = locations.find(l => l.id === medium.ubicacionId)?.nombre || `Ubicación #${medium.ubicacionId}`;
-  const corduraVal = medium.cordura ?? 100;
+  const corduraVal = (medium.cordura !== null && medium.cordura !== undefined && medium.cordura > 0) ? medium.cordura : 100;
   const manaVal = medium.mana ?? 0;
   const manaMaxVal = medium.manaMax ?? 100;
   const manaPercent = Math.min(100, Math.max(0, (manaVal / manaMaxVal) * 100));

@@ -111,6 +111,8 @@ export function App() {
             <SpiritBoxPage
               mediums={mediums}
               locations={locations}
+              spirits={spirits}
+              onRefresh={fetchInitialData}
             />
           )}
 
