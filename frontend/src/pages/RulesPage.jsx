@@ -43,7 +43,7 @@ export function RulesPage() {
   ];
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '24px', alignItems: 'start' }}>
+    <div className="responsive-sidebar-grid">
 
       {/* SIDEBAR NAV */}
       <div className="hud-panel" style={{ padding: '16px', position: 'sticky', top: '16px' }}>
@@ -101,10 +101,13 @@ export function RulesPage() {
                   <div style={RULE_CARD}><TAG color="var(--primary-green)">DESCANSO</TAG> El medium recupera <strong>150% de la energía</strong> de la zona en maná (hasta su manaMax)</div>
                   <div style={RULE_CARD}><TAG color="var(--primary-green)">ÁNGELES</TAG> Ganan nivel de conexión equivalente a la energía del santuario (hasta el máximo de 100%)</div>
                   <div style={RULE_CARD}><TAG color="var(--demonic-red)">DEMONIOS</TAG> <strong>No pueden recuperarse</strong> en santuarios</div>
-                  <div style={{ background: 'rgba(0,255,128,0.05)', border: '1px solid rgba(0,255,128,0.2)', borderRadius: '8px', padding: '12px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    <strong>Ejemplo del Enunciado:</strong> Lorraine tiene 10 de maná y descansa en un santuario de energía 100 (recupera 150% = +150 maná). 
-                    <br />• <em>Cálculo teórico:</em> 10 + 150 = 160 de maná.
-                    <br />• <em>En el código:</em> El maná resultante siempre se acota al <strong>manaMax</strong> del médium.
+                  <div style={{ background: 'rgba(0,255,128,0.05)', border: '1px solid rgba(0,255,128,0.2)', borderRadius: '8px', padding: '12px', fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    <strong>Explicación Detallada del Cálculo de Descanso:</strong>
+                    <br />• <strong>Fórmula:</strong> <code style={{ color: 'var(--primary-green)' }}>Maná Ganado = Energía de la Ubicación × 1.5</code> (recupera el 150% del valor de energía).
+                    <br />• <strong>Ejemplo Práctico:</strong> Lorraine tiene <strong>10 de maná actual</strong> (con <code>manaMax = 100</code>) y descansa en un Santuario de <strong>Energía = 100</strong>.
+                    <br />• <strong>Paso 1:</strong> Maná recuperado = <code style={{ color: 'var(--primary-green)' }}>100 × 1.5 = +150 puntos</code>.
+                    <br />• <strong>Paso 2:</strong> Maná resultante teórico = <code>10 + 150 = 160</code>.
+                    <br />• <strong>Paso 3 (Tope Máximo):</strong> Como el maná no puede exceder su <code>manaMax</code> (100), el valor final se ajusta a <strong>100 de maná</strong>.
                   </div>
                 </div>
               </div>
@@ -120,8 +123,13 @@ export function RulesPage() {
                   <div style={RULE_CARD}><TAG color="var(--demonic-red)">DESCANSO</TAG> El medium recupera <strong>50% de la energía</strong> de la zona en maná (hasta su manaMax)</div>
                   <div style={RULE_CARD}><TAG color="var(--demonic-red)">DEMONIOS</TAG> Ganan nivel de conexión equivalente a la energía del cementerio (hasta el máximo de 100%)</div>
                   <div style={RULE_CARD}><TAG color="var(--primary-green)">ÁNGELES</TAG> <strong>No pueden recuperarse</strong> en cementerios</div>
-                  <div style={{ background: 'rgba(255,50,80,0.05)', border: '1px solid rgba(255,50,80,0.2)', borderRadius: '8px', padding: '12px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    <strong>Ejemplo del Enunciado:</strong> John tiene 10 de maná y descansa en un cementerio de energía 100 (recupera 50% = +50 maná). Termina con 60 de maná.
+                  <div style={{ background: 'rgba(255,50,80,0.05)', border: '1px solid rgba(255,50,80,0.2)', borderRadius: '8px', padding: '12px', fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    <strong>Explicación Detallada del Cálculo de Descanso:</strong>
+                    <br />• <strong>Fórmula:</strong> <code style={{ color: 'var(--demonic-red)' }}>Maná Ganado = Energía de la Ubicación × 0.5</code> (recupera el 50% del valor de energía).
+                    <br />• <strong>Ejemplo Práctico:</strong> John tiene <strong>10 de maná actual</strong> (con <code>manaMax = 100</code>) y descansa en un Cementerio de <strong>Energía = 100</strong>.
+                    <br />• <strong>Paso 1:</strong> Maná recuperado = <code style={{ color: 'var(--demonic-red)' }}>100 × 0.5 = +50 puntos</code>.
+                    <br />• <strong>Paso 2:</strong> Maná resultante = <code>10 + 50 = 60</code>.
+                    <br />• <strong>Paso 3:</strong> Como 60 no supera el <code>manaMax</code> (100), su maná final queda en <strong>60 de maná</strong>.
                   </div>
                 </div>
               </div>

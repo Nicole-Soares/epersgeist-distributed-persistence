@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { mediumService } from '../services/mediumService';
 import { spiritService } from '../services/spiritService';
+import { seedService } from '../services/seedService';
 import { formatErrorMessage } from '../services/errorHandler';
 import { useModal } from './ModalProvider';
-import { Swords, Flame, Sparkles, User, Crosshair, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Swords, Flame, Sparkles, User, Crosshair, AlertTriangle, CheckCircle, Zap } from 'lucide-react';
 
 export function ExorcismChamber({ mediums, spirits, onRefresh }) {
   const { showAlert } = useModal();
@@ -15,13 +16,24 @@ export function ExorcismChamber({ mediums, spirits, onRefresh }) {
   const exorcistMedium = mediums.find(m => m.id === Number(exorcistId));
   const victimMedium = mediums.find(m => m.id === Number(victimId));
 
-  const exorcistAngels = spirits.filter(s => 
-    (s.tipo === 'ANGEL' || s.tipo === 'ANGELICAL') && (s.mediumId === Number(exorcistId) || (exorcistMedium?.espiritus || []).some(e => e.id === s.id))
-  );
+  // Use embedded espiritus from the medium object as primary source, deduplicate by ID
+  const getAngels = (medium) => {
+    const embedded = (medium?.espiritus || []).filter(s => s.tipo === 'ANGEL' || s.tipo === 'ANGELICAL');
+    const fromGlobal = spirits.filter(s => (s.tipo === 'ANGEL' || s.tipo === 'ANGELICAL') && s.mediumId === medium?.id);
+    const map = new Map();
+    [...embedded, ...fromGlobal].forEach(s => map.set(s.id, s));
+    return [...map.values()];
+  };
+  const getDemons = (medium) => {
+    const embedded = (medium?.espiritus || []).filter(s => s.tipo === 'DEMONIO');
+    const fromGlobal = spirits.filter(s => s.tipo === 'DEMONIO' && s.mediumId === medium?.id);
+    const map = new Map();
+    [...embedded, ...fromGlobal].forEach(s => map.set(s.id, s));
+    return [...map.values()];
+  };
 
-  const victimDemons = spirits.filter(s => 
-    s.tipo === 'DEMONIO' && (s.mediumId === Number(victimId) || (victimMedium?.espiritus || []).some(e => e.id === s.id))
-  );
+  const exorcistAngels = getAngels(exorcistMedium);
+  const victimDemons = getDemons(victimMedium);
   const isSameLocation = exorcistMedium && victimMedium && (exorcistMedium.ubicacionId === victimMedium.ubicacionId);
 
   const handleExorcism = async () => {
@@ -43,8 +55,8 @@ export function ExorcismChamber({ mediums, spirits, onRefresh }) {
     if (!isSameLocation) {
       setBattleLog([
         `⚠️ RITUAL IMPOSIBLE: Ambos Médiums están en ubicaciones diferentes.`,
-        `📍 Exorcista (${exorcistMedium?.nombre}) está en Ubicación #${exorcistMedium?.ubicacionId}.`,
-        `📍 Víctima (${victimMedium?.nombre}) está en Ubicación #${victimMedium?.ubicacionId}.`,
+        `📍 Exorcista (${exorcistMedium?.nombre}) está en "${exorcistMedium?.ubicacion?.nombre || 'su ubicación'}".`,
+        `📍 Víctima (${victimMedium?.nombre}) está en "${victimMedium?.ubicacion?.nombre || 'su ubicación'}".`,
         `💡 Sugerencia: Mueve a ambos Médiums a la misma ubicación desde el Mapa.`
       ]);
       return showAlert(`El Exorcista y la Víctima deben encontrarse en la misma ubicación para realizar el ritual.`, 'UBICACIÓN DIFERENTE', 'warning');
@@ -139,16 +151,35 @@ export function ExorcismChamber({ mediums, spirits, onRefresh }) {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+    <div className="responsive-two-column-grid">
       
       {/* EXORCISM CONTROLS */}
       <div className="hud-panel" style={{ padding: '24px' }}>
         <h2 className="font-orbitron glow-text-red" style={{ fontSize: '1.2rem', color: 'var(--demonic-red)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Swords size={24} /> CÁMARA DE RITUALES Y EXORCISMOS
         </h2>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
           Enfrenta las fuerzas celestiales del Medium Exorcista contra los demonios que poseen a la víctima en la misma ubicación.
         </p>
+
+        {/* Explicación Didáctica y de Flujo de Juego */}
+        <div style={{
+          background: 'rgba(0, 229, 255, 0.05)',
+          border: '1px solid rgba(0, 229, 255, 0.25)',
+          borderRadius: '8px',
+          padding: '12px 14px',
+          fontSize: '0.82rem',
+          color: 'var(--ice-blue)',
+          marginBottom: '20px',
+          lineHeight: '1.45'
+        }}>
+          <strong>💡 Flujo Didáctico y Roles Dinámicos:</strong>
+          <ul style={{ margin: '6px 0 0 16px', padding: 0 }}>
+            <li><strong>Cualquier Médium puede ser Exorcista o Víctima:</strong> El rol lo determina la entidad enlazada (Ángeles = Exorcista / Demonios = Víctima).</li>
+            <li><strong>Mecánica Principal:</strong> Mueve médiums entre Santuarios y Cementerios para invocar y conectar espíritus libres, y luego reúne al Exorcista y a la Víctima en la misma zona.</li>
+            <li><strong>Botón Rápido (Generador Épico):</strong> Por motivos didácticos y de tiempo de evaluación, se proporciona un botón al final para instanciar rápidamente un escenario listo para exorcizar sin requerir desplazamientos previos.</li>
+          </ul>
+        </div>
 
         <div style={{ display: 'grid', gap: '16px' }}>
           
@@ -163,7 +194,7 @@ export function ExorcismChamber({ mediums, spirits, onRefresh }) {
             >
               <option value="">-- Seleccionar Exorcista --</option>
               {mediums.map(m => {
-                const numAngels = spirits.filter(s => (s.tipo === 'ANGEL' || s.tipo === 'ANGELICAL') && (s.mediumId === m.id || (m.espiritus || []).some(e => e.id === s.id))).length;
+                const numAngels = getAngels(m).length;
                 return (
                   <option key={m.id} value={m.id}>
                     {m.nombre} (👼 {numAngels} Ángeles)
@@ -193,7 +224,7 @@ export function ExorcismChamber({ mediums, spirits, onRefresh }) {
             >
               <option value="">-- Seleccionar Víctima --</option>
               {mediums.filter(m => m.id !== Number(exorcistId)).map(m => {
-                const numDemons = spirits.filter(s => s.tipo === 'DEMONIO' && (s.mediumId === m.id || (m.espiritus || []).some(e => e.id === s.id))).length;
+                const numDemons = getDemons(m).length;
                 return (
                   <option key={m.id} value={m.id}>
                     {m.nombre} (😈 {numDemons} Demonios)
@@ -224,6 +255,28 @@ export function ExorcismChamber({ mediums, spirits, onRefresh }) {
             style={{ width: '100%', padding: '14px', fontSize: '1rem', justifyContent: 'center', marginTop: '10px' }}
           >
             <Flame size={20} /> Iniciar Ritual de Purificación
+          </button>
+
+          <button
+            className="btn-hud btn-hud-purple"
+            onClick={async () => {
+              setLoading(true);
+              try {
+                const res = await seedService.seedExorcismoPoderoso();
+                showAlert(`¡Escenario Generado! Se crearon "${res.exorcista.nombre}" con el "${res.angel.nombre}" (Conexión 95%) y "${res.victima.nombre}" con "${res.demonio.nombre}".`, 'ESCENARIO PODEROSO LISTO', 'success');
+                if (onRefresh) await onRefresh();
+                setExorcistId(String(res.exorcista.id));
+                setVictimId(String(res.victima.id));
+              } catch (e) {
+                showAlert(formatErrorMessage(e), 'ERROR AL GENERAR', 'error');
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            style={{ width: '100%', padding: '10px', fontSize: '0.85rem', justifyContent: 'center', marginTop: '4px' }}
+          >
+            <Zap size={16} /> ⚡ Generar Escenario de Exorcismo Épico (Ángel Poderoso 95%)
           </button>
         </div>
       </div>

@@ -135,21 +135,21 @@ export function SpiritRoster({ spirits, mediums, locations = [], onRefresh }) {
                 </div>
 
                 {!s.mediumId && (
-                  <div style={{ marginTop: '12px', display: 'flex', gap: '6px' }}>
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <select
                       value={cardMediums[s.id] || selectedMediumId || ''}
                       onChange={(e) => setCardMediums({ ...cardMediums, [s.id]: e.target.value })}
                       style={{
-                        flex: 1,
+                        width: '100%',
                         background: '#0a0e17',
                         border: '1px solid var(--bg-card-border)',
                         color: 'var(--text-main)',
                         fontSize: '0.8rem',
-                        padding: '4px 6px',
+                        padding: '6px 8px',
                         borderRadius: '4px'
                       }}
                     >
-                      <option value="">-- Médium --</option>
+                      <option value="">-- Seleccionar Médium --</option>
                       {mediums.map(m => (
                         <option key={m.id} value={m.id}>{m.nombre}</option>
                       ))}
@@ -158,9 +158,9 @@ export function SpiritRoster({ spirits, mediums, locations = [], onRefresh }) {
                       className="btn-hud btn-hud-blue"
                       onClick={() => handleConectar(s.id, cardMediums[s.id] || selectedMediumId)}
                       disabled={loading || !(cardMediums[s.id] || selectedMediumId)}
-                      style={{ padding: '4px 10px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+                      style={{ width: '100%', padding: '6px 12px', fontSize: '0.8rem', justifyContent: 'center' }}
                     >
-                      <Link size={14} /> Conectar
+                      <Link size={14} /> Conectar Médium
                     </button>
                   </div>
                 )}

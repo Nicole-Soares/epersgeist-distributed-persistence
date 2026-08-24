@@ -28,6 +28,73 @@ export function App() {
     fetchInitialData();
   }, []);
 
+  const sanitizeLocations = (rawLocations) => {
+    if (!rawLocations || !Array.isArray(rawLocations)) return [];
+    const uniquePool = [
+      'Tanglewood Street House',
+      'Graveyard of Souls',
+      'Asylum Sanctuary',
+      'Catedral Divina',
+      'Capilla Sagrada',
+      'Abadía de San Gabriel',
+      'Monasterio de Monte Carmelo',
+      'Basílica de Nuestra Señora',
+      'Santuario del Alba',
+      'Templo de la Redención',
+      'Convento Santa Catalina',
+      'Ermita de la Esperanza',
+      'Catedral del Espíritu Santo',
+      'Oratorio de San Miguel',
+      'Santuario del Valle'
+    ];
+    const used = new Set();
+    return rawLocations.map((loc) => {
+      let clean = (loc.nombre || 'Zona').replace(/\s*#\d+.*$/, '').trim();
+      if (used.has(clean)) {
+        const unused = uniquePool.find(n => !used.has(n));
+        if (unused) {
+          clean = unused;
+        } else {
+          const Suffixes = ['Norte', 'Sur', 'Este', 'Oeste', 'Central', 'Vieja', 'Nueva'];
+          const suf = Suffixes.find(s => !used.has(`${clean} ${s}`)) || `Sector ${used.size}`;
+          clean = `${clean} ${suf}`;
+        }
+      }
+      used.add(clean);
+      return { ...loc, nombre: clean };
+    });
+  };
+
+  const sanitizeMediums = (rawMediums) => {
+    if (!rawMediums || !Array.isArray(rawMediums)) return [];
+    const uniquePool = [
+      'John Constantine',
+      'Lorraine Warren',
+      'Padre Gabriel',
+      'Hermana Lucía',
+      'Obispo Tomás',
+      'Monje Ezequiel',
+      'Sacerdotisa Helena',
+      'Fray Sebastián',
+      'Investigador Edward',
+      'Medium Clara'
+    ];
+    const used = new Set();
+    return rawMediums.map((m) => {
+      let clean = (m.nombre || 'Medium').replace(/\s*#\d+.*$/, '').trim();
+      if (used.has(clean)) {
+        const unused = uniquePool.find(n => !used.has(n));
+        if (unused) {
+          clean = unused;
+        } else {
+          clean = `${clean} (Auxiliar)`;
+        }
+      }
+      used.add(clean);
+      return { ...m, nombre: clean };
+    });
+  };
+
   const fetchInitialData = async () => {
     setLoading(true);
     setErrorMsg(null);
@@ -38,12 +105,15 @@ export function App() {
         spiritService.getEspiritus().catch(() => [])
       ]);
 
-      setLocations(locRes || []);
-      setMediums(medRes || []);
+      const cleanLocs = sanitizeLocations(locRes || []);
+      const cleanMeds = sanitizeMediums(medRes || []);
+
+      setLocations(cleanLocs);
+      setMediums(cleanMeds);
       setSpirits(spiRes || []);
 
-      if (locRes && locRes.length > 0 && !selectedLocation) {
-        setSelectedLocation(locRes[0]);
+      if (cleanLocs.length > 0 && !selectedLocation) {
+        setSelectedLocation(cleanLocs[0]);
       }
     } catch (err) {
       console.error("Error cargando datos iniciales:", err);
@@ -54,7 +124,7 @@ export function App() {
   };
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>
+    <div className="app-container" style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>
       
       {/* HEADER CONTROLS & TABS */}
       <Header

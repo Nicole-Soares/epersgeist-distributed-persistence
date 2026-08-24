@@ -52,12 +52,21 @@ export function MapPage({ locations, mediums, onRefresh, selectedLocation, setSe
       // El endpoint mover(latitud, longitud) espera: latitud ~-34, longitud ~-58
       // Por eso usamos v.longitud como latitud y v.latitud como longitud
       const verts = loc.vertices ?? [];
-      const lat = verts.length
-        ? verts.reduce((a, v) => a + v.longitud, 0) / verts.length   // v.longitud ≈ -34 (es la lat real)
-        : -34.71;
-      const lng = verts.length
-        ? verts.reduce((a, v) => a + v.latitud, 0) / verts.length    // v.latitud ≈ -58 (es la lon real)
-        : -58.28;
+      // v.latitud es la latitud real (~-34) y v.longitud es la longitud real (~-58)
+      let lat = -34.71;
+      let lng = -58.28;
+      if (verts.length > 0) {
+        const avg1 = verts.reduce((a, v) => a + (v.latitud ?? 0), 0) / verts.length;
+        const avg2 = verts.reduce((a, v) => a + (v.longitud ?? 0), 0) / verts.length;
+        // Identificar cuál promedio es latitud (~-34) y cuál es longitud (~-58)
+        if (Math.abs(avg1) < Math.abs(avg2)) {
+          lat = avg1;
+          lng = avg2;
+        } else {
+          lat = avg2;
+          lng = avg1;
+        }
+      }
       await mediumService.moverMedium(selectedMediumId, lat, lng);
       showAlert(`Medium movido exitosamente a ${loc.nombre}`, 'DESPLAZAMIENTO EXITOSO', 'success');
       onRefresh();
@@ -109,7 +118,7 @@ export function MapPage({ locations, mediums, onRefresh, selectedLocation, setSe
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+    <div className="responsive-split-grid">
 
       {/* MAP GRID */}
       <div>
@@ -141,7 +150,7 @@ export function MapPage({ locations, mediums, onRefresh, selectedLocation, setSe
             <option value="">-- Seleccionar Medium --</option>
             {mediums.map(m => (
               <option key={m.id} value={m.id}>
-                {m.nombre} (Maná: {m.mana}/{m.manaMax} | {locations.find(l => l.id === m.ubicacionId)?.nombre || `Zona #${m.ubicacionId}`})
+                {m.nombre} (Maná: {m.mana}/{m.manaMax} | {m.ubicacion?.nombre || locations.find(l => String(l.id) === String(m.ubicacionId))?.nombre || 'En mapa'})
               </option>
             ))}
           </select>

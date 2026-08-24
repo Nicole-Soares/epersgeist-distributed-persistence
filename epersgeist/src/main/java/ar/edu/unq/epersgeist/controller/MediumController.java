@@ -84,11 +84,15 @@ public class MediumController {
         return ResponseEntity.ok(espirituRecuperado);
     }
 
-    @PatchMapping("/{mediumId}/mover/{latitud}/{longitud}")
+    @PatchMapping(value = {"/{mediumId}/mover/{latitud:.+}/{longitud:.+}", "/{mediumId}/mover"})
     public ResponseEntity<RecuperarMediumDTO> mover(@PathVariable Long mediumId,
-                                                    @PathVariable Double latitud,
-                                                    @PathVariable Double longitud) {
-        mediumService.mover(mediumId, latitud, longitud);
+                                                    @PathVariable(required = false) Double latitud,
+                                                    @PathVariable(required = false) Double longitud,
+                                                    @RequestParam(required = false) Double lat,
+                                                    @RequestParam(required = false) Double lng) {
+        Double finalLat = latitud != null ? latitud : lat;
+        Double finalLng = longitud != null ? longitud : lng;
+        mediumService.mover(mediumId, finalLat, finalLng);
         RecuperarMediumDTO mediumRecuperado = RecuperarMediumDTO.desdeModelo(mediumService.findById(mediumId));
         return ResponseEntity.ok(mediumRecuperado);
     }

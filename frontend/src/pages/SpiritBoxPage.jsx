@@ -213,7 +213,7 @@ export function SpiritBoxPage({ mediums = [], locations = [], spirits = [], onRe
         </div>
 
         {/* SELECTORES DE MEDIUM Y ESPÍRITU */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '16px', marginBottom: '20px', alignItems: 'end' }}>
+        <div className="responsive-three-column-grid" style={{ marginBottom: '20px' }}>
           
           {/* SELECTOR DE MEDIUM */}
           <div>

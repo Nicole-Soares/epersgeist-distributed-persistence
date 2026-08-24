@@ -28,35 +28,10 @@ export function Header({ onRefresh, onOpenCreateModal, activeTab, setActiveTab }
           </div>
         </div>
 
-        {/* Status Indicators */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          <span className="badge-hud badge-green">
-            <Radio size={14} /> Backend :8080 OK
-          </span>
-          <span className="badge-hud badge-blue">
-            <Cpu size={14} /> Messaging :8090 OK
-          </span>
-          <span className="badge-hud badge-purple">
-            <ShieldAlert size={14} /> Kafka Event Bus
-          </span>
-        </div>
-
-        {/* Action Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <SeedDataButton onDataSeeded={onRefresh} />
-          
-          <button 
-            className="btn-hud" 
-            onClick={onOpenCreateModal}
-          >
-            <PlusCircle size={16} /> Nuevo Ente / Zona
-          </button>
-        </div>
-
       </div>
 
       {/* Navigation Tabs */}
-      <nav style={{ display: 'flex', gap: '12px', marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px' }}>
+      <nav className="nav-tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px' }}>
         {[
           { id: 'map', label: '🗺️ Mapa Táctico & Zonas' },
           { id: 'investigation', label: '👥 Investigadores & Espíritus' },
@@ -67,7 +42,7 @@ export function Header({ onRefresh, onOpenCreateModal, activeTab, setActiveTab }
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`btn-hud ${activeTab === tab.id ? '' : 'btn-hud-blue'}`}
+            className={`btn-hud nav-tab-btn ${activeTab === tab.id ? '' : 'btn-hud-blue'}`}
             style={{
               opacity: activeTab === tab.id ? 1 : 0.7,
               background: activeTab === tab.id ? 'var(--primary-green)' : 'transparent',
