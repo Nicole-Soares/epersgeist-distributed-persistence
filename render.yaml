@@ -1,0 +1,23 @@
+services:
+  # Monolito Backend Spring Boot (Epersgeist)
+  - type: web
+    name: epersgeist-backend
+    runtime: docker
+    dockerfile: Dockerfile.epersgeist
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: epersgeist-postgres
+          property: connectionString
+
+databases:
+  # PostgreSQL gratis en Render
+  - name: epersgeist-postgres
+    plan: free
+    databaseName: epersgeist_db
+    user: epersgeist_user
