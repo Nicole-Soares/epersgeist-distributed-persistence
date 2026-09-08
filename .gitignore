@@ -3,11 +3,11 @@
 ### -----------------------------------------
 .gradle/
 **/build/
-!gradle/wrapper/gradle-wrapper.jar
 !gradle/wrapper/gradle-wrapper.properties
 
 # Secretos y Config Local en cualquier carpeta del proyecto
 **/application.properties
+!epersgeist/src/main/resources/application.properties
 **/application-*.properties
 !**/application-dev.properties
 **/application.yml
@@ -21,6 +21,7 @@
 ### -----------------------------------------
 *.class
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.ear
 
